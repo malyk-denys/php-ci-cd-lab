@@ -22,4 +22,11 @@ final class CalculatorTest extends TestCase
 
         self::assertSame(3, $calculator->subtract(5, 2));
     }
+
+    public function test_multiply_returns_product(): void
+    {
+        $calculator = new Calculator;
+
+        self::assertSame(12, $calculator->multiply(3, 4));
+    }
 }

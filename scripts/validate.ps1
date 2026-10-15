@@ -5,10 +5,12 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 
 $requiredFiles = @(
+    '.gitattributes',
     '.gitignore',
     'composer.json',
     'phpunit.xml',
     'README.md',
+    'VALIDATION.md',
     '.github/PULL_REQUEST_TEMPLATE.md',
     '.github/workflows/php-ci.yml',
     'app/Services/Calculator.php',

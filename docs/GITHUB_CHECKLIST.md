@@ -4,26 +4,26 @@
 
 ## 1. Репозиторій і початкова гілка
 
-- [ ] Створити репозиторій `php-ci-cd-lab` на GitHub.
-- [ ] Опублікувати початковий `README.md` у `main`.
-- [ ] Створити гілку `initialize-repository` з `.gitignore` і `.github/PULL_REQUEST_TEMPLATE.md`.
+- [x] Створити публічний репозиторій `php-ci-cd-lab` на GitHub.
+- [x] Опублікувати початковий `README.md` у `main`.
+- [x] Створити гілку `initialize-repository` з `.gitignore` і `.github/PULL_REQUEST_TEMPLATE.md`.
 - [ ] Відкрити Pull Request `initialize-repository -> main`.
 - [ ] Додати двох одногрупників як collaborators і reviewers, а себе - як assignee.
 - [ ] Отримати два реальні approve та злити Pull Request.
 
 ## 2. Безпека і захист `main`
 
-- [ ] У `Settings -> Secrets and variables -> Actions` створити secret `MY_SUPER_SECRET_KEY` зі значенням не коротшим за 8 символів.
+- [x] У `Settings -> Secrets and variables -> Actions` створити secret `MY_SUPER_SECRET_KEY` зі значенням не коротшим за 8 символів.
 - [ ] У ruleset або branch protection для `main` увімкнути `Require status checks to pass before merging`.
 - [ ] Вибрати обов'язкову перевірку `build` із workflow `PHP CI Application`.
 
 ## 3. CI-пайплайн
 
-- [ ] Створити гілку `feature-cicd-pipeline`.
-- [ ] Для першого CI-запуску тимчасово використати невідформатований метод із `docs/INITIAL_FAILURE.md`.
+- [x] Створити гілку `feature-cicd-pipeline`.
+- [x] Для першого CI-запуску тимчасово використати невідформатований метод із `docs/INITIAL_FAILURE.md`.
 - [ ] Відкрити Pull Request у `main` і зробити скріншоти червоного статусу, логу Pint та заблокованого Merge.
-- [ ] Замінити файл на фінальну відформатовану версію `app/Services/Calculator.php` і відправити новий commit.
-- [ ] Переконатися, що Pint і PHPUnit успішні, а в кроці `Demonstrate GitHub Secrets` значення показано як `***`.
+- [x] Замінити файл на фінальну відформатовану версію `app/Services/Calculator.php` і відправити новий commit.
+- [x] Переконатися, що Pint і PHPUnit успішні, а в кроці `Demonstrate GitHub Secrets` значення показано як `***`.
 - [ ] Зробити скріншоти зеленого workflow, замаскованого secret і README з badge.
 - [ ] Злити Pull Request у `main`.
 

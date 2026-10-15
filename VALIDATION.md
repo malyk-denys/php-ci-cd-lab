@@ -12,14 +12,19 @@
 - `git diff --check` не виявив помилок пробілів.
 - Створено локальні гілки `main`, `initialize-repository` і `feature-cicd-pipeline` та поетапну історію комітів.
 
-## Що перевіряє GitHub Actions
+## Перевірено в GitHub Actions
 
-На комп'ютері немає локальних команд `php`, `composer` і `docker`, що відповідає примітці в умові про виконання PHP-перевірок на GitHub Actions. Тому фактичні запуски нижче мають бути підтверджені серверним workflow після створення репозиторію:
+Репозиторій: `https://github.com/malyk-denys/php-ci-cd-lab`.
 
-- встановлення залежностей Composer;
-- перевірка форматування Laravel Pint;
-- виконання тестів PHPUnit;
-- маскування значення secret як `***`.
+- Перший запуск `38737889917` очікувано завершився помилкою на кроці Pint через навмисне порушення форматування.
+- Після виправлення форматування запуск `38738298167` завершився зі статусом **success**.
+- Laravel Pint: **PASS**, перевірено 2 PHP-файли.
+- PHPUnit 10.5.66: **OK (2 tests, 2 assertions)**.
+- Крок `Demonstrate GitHub Secrets`: **success**; значення `MY_SUPER_SECRET_KEY` у журналі замасковане як `***`.
+- Pull Request `#1` відкритий з `feature-cicd-pipeline` у `main`, автор призначений assignee.
+- Запрошення collaborator надіслано користувачу `Vitaliiumortols`; прийняття запрошення залежить від нього.
 
-Файл `docs/GITHUB_CHECKLIST.md` містить зовнішні кроки та точний перелік скріншотів, які потрібно одержати з реального GitHub-репозиторію. Серверні approvals, branch protection, Actions logs та Kanban не позначені виконаними без фактичних доказів.
+На комп'ютері немає локальних команд `php`, `composer` і `docker`, тому реальні PHP-перевірки виконано на серверному runner GitHub Actions з PHP 8.2.34 і Composer 2.10.3.
+
+Файл `docs/GITHUB_CHECKLIST.md` містить решту зовнішніх кроків. Approvals, branch protection, злиття Pull Request та Kanban не позначаються виконаними без фактичних доказів.
 

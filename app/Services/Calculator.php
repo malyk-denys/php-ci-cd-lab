@@ -16,4 +16,3 @@ final class Calculator
         return $x - $y;
     }
 }
-

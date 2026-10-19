@@ -7,4 +7,6 @@
 .env.*
 !.env.example
 *.log
+/tools/plantuml.jar
+/.tmp/
 

@@ -1,0 +1,73 @@
+@startuml
+!theme plain
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName "Arial"
+skinparam defaultFontSize 15
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #F7FAFC
+  BorderColor #1F4E78
+  ArrowColor #4A5568
+}
+skinparam rectangle {
+  BorderColor #1F4E78
+  BackgroundColor #FFFFFF
+}
+
+title Електронна система продажу квитків до кінотеатру
+
+actor "Відвідувач" as Visitor
+actor "Зареєстрований\nпокупець" as Customer
+actor "Адміністратор" as Administrator
+
+Customer --|> Visitor
+
+rectangle "Cinema Ticket System" {
+  usecase "Переглянути афішу" as UC_Browse
+  usecase "Переглянути опис\nфільму" as UC_Details
+  usecase "Переглянути розклад" as UC_Schedule
+  usecase "Зареєструватися або\nувійти" as UC_Auth
+  usecase "Придбати квиток" as UC_Buy
+  usecase "Обрати місця" as UC_Seats
+  usecase "Виконати оплату" as UC_Pay
+  usecase "Сформувати електронний\nквиток" as UC_Ticket
+  usecase "Застосувати промокод" as UC_Promo
+  usecase "Переглянути свої квитки" as UC_MyTickets
+  usecase "Повернути квиток" as UC_Return
+  usecase "Керувати фільмами" as UC_ManageMovies
+  usecase "Керувати сеансами" as UC_ManageScreenings
+  usecase "Керувати залами\nта місцями" as UC_ManageHalls
+  usecase "Переглянути звіти\nз продажів" as UC_Reports
+  usecase "Скасувати сеанс" as UC_CancelScreening
+}
+
+Visitor --> UC_Browse
+Visitor --> UC_Details
+Visitor --> UC_Schedule
+Visitor --> UC_Auth
+Customer --> UC_Buy
+Customer --> UC_MyTickets
+Customer --> UC_Return
+Administrator --> UC_ManageMovies
+Administrator --> UC_ManageScreenings
+Administrator --> UC_ManageHalls
+Administrator --> UC_Reports
+
+UC_Buy ..> UC_Auth : <<include>>
+UC_Buy ..> UC_Seats : <<include>>
+UC_Buy ..> UC_Pay : <<include>>
+UC_Buy ..> UC_Ticket : <<include>>
+UC_Promo ..> UC_Buy : <<extend>>
+UC_Return ..> UC_MyTickets : <<extend>>
+UC_CancelScreening ..> UC_ManageScreenings : <<extend>>
+
+legend bottom
+  Асоціація: суцільна лінія між актором і варіантом використання
+  Узагальнення: покупець успадковує можливості відвідувача
+  include: обов'язковий підпроцес
+  extend: необов'язкове або умовне розширення
+endlegend
+@enduml

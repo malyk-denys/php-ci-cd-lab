@@ -534,13 +534,13 @@ def build_report(pr_url: str | None, student_name: str | None, group: str | None
         add_compact_numbered_item(doc, number, item)
 
     landscape = doc.add_section(WD_SECTION.NEW_PAGE)
-    configure_section(landscape, landscape=True)
+    configure_section(landscape, landscape=True, large=True)
     add_heading(doc, "5 Діаграма варіантів використання")
     add_body(
         doc,
         "Взаємодію трьох акторів із системою показано на рисунку 1. Діаграма містить асоціацію, узагальнення, include та extend. Вихідний код збережено у файлі use-case-diagram.puml.",
     )
-    add_picture(doc, USE_CASE_IMAGE, 135, 115)
+    add_picture(doc, USE_CASE_IMAGE, 200, 174)
     add_caption(doc, "Рисунок 1 — Діаграма варіантів використання системи продажу квитків")
 
     landscape2 = doc.add_section(WD_SECTION.NEW_PAGE)

@@ -135,7 +135,13 @@ def set_table_borders(table, color: str = GRAY, size: str = "6"):
         tag.set(qn("w:color"), color)
 
 
-def add_table(doc: Document, headers: list[str], rows: list[list[str]], widths_cm: list[float]):
+def add_table(doc: Document, headers: list[str], rows: list[list[str]], widths_cm: list[float], caption: str):
+    caption_paragraph = doc.add_paragraph()
+    caption_paragraph.paragraph_format.first_line_indent = Cm(1.25)
+    caption_paragraph.paragraph_format.keep_with_next = True
+    caption_paragraph.paragraph_format.space_before = Pt(5)
+    caption_paragraph.paragraph_format.space_after = Pt(3)
+    set_run_font(caption_paragraph.add_run(caption), 12)
     table = doc.add_table(rows=1, cols=len(headers))
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
@@ -186,20 +192,19 @@ def add_page_number(paragraph):
     run._r.extend([begin, instr, end])
 
 
-def configure_section(section, *, landscape: bool = False, narrow: bool = False):
+def configure_section(section, *, landscape: bool = False, large: bool = False):
     if landscape:
         section.orientation = WD_ORIENT.LANDSCAPE
-        section.page_width = Mm(297)
-        section.page_height = Mm(210)
+        section.page_width = Mm(420 if large else 297)
+        section.page_height = Mm(297 if large else 210)
     else:
         section.orientation = WD_ORIENT.PORTRAIT
         section.page_width = Mm(210)
         section.page_height = Mm(297)
-    margin = Mm(10 if narrow else 20)
-    section.top_margin = margin
-    section.bottom_margin = margin
-    section.left_margin = Mm(15 if landscape else 25)
-    section.right_margin = Mm(15 if landscape else 15)
+    section.top_margin = Mm(20)
+    section.bottom_margin = Mm(20)
+    section.left_margin = Mm(25)
+    section.right_margin = Mm(10 if landscape else 15)
     section.header_distance = Mm(8)
     section.footer_distance = Mm(8)
     section.footer.is_linked_to_previous = False
@@ -211,11 +216,11 @@ def configure_section(section, *, landscape: bool = False, narrow: bool = False)
 def add_caption(doc: Document, text: str):
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.paragraph_format.keep_with_next = True
+    p.paragraph_format.space_before = Pt(5)
     p.paragraph_format.space_after = Pt(5)
     p.paragraph_format.first_line_indent = Cm(0)
     run = p.add_run(text)
-    set_run_font(run, 12, italic=True)
+    set_run_font(run, 12)
     return p
 
 
@@ -223,6 +228,7 @@ def add_picture(doc: Document, path: Path, width_mm: float):
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_after = Pt(0)
+    p.paragraph_format.keep_with_next = True
     run = p.add_run()
     run.add_picture(str(path), width=Mm(width_mm))
     return p
@@ -250,7 +256,7 @@ def add_hyperlink(paragraph, text: str, url: str):
     paragraph._p.append(hyperlink)
 
 
-def build_report(pr_url: str | None):
+def build_report(pr_url: str | None, student_name: str | None, group: str | None, institution: str | None, department: str | None, teacher: str | None):
     if not USE_CASE_IMAGE.exists() or not CLASS_IMAGE.exists():
         raise FileNotFoundError("Render both PlantUML diagrams before building the report")
 
@@ -282,7 +288,7 @@ def build_report(pr_url: str | None):
 
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    for line in ("________________________________________", "________________________________________"):
+    for line in (institution or "Заклад освіти: ____________________", department or "Кафедра: ____________________"):
         run = p.add_run(line)
         set_run_font(run, 12)
         run.add_break()
@@ -299,10 +305,10 @@ def build_report(pr_url: str | None):
     subtitle = doc.add_paragraph()
     subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
     subtitle.paragraph_format.space_after = Pt(10)
-    run = subtitle.add_run("Проєктування веб системи")
+    run = subtitle.add_run("Проєктування вебсистеми")
     set_run_font(run, 16, bold=True)
     run.add_break()
-    run2 = subtitle.add_run("Аналіз предметної галузі та побудова UML діаграм")
+    run2 = subtitle.add_run("Аналіз предметної галузі та побудова UML-діаграм")
     set_run_font(run2, 16, bold=True)
 
     topic = doc.add_paragraph()
@@ -318,12 +324,16 @@ def build_report(pr_url: str | None):
     info = doc.add_table(rows=3, cols=2)
     info.alignment = WD_TABLE_ALIGNMENT.RIGHT
     info.autofit = False
-    labels = ["Виконав або виконала", "Група", "Перевірив або перевірила"]
-    for row, label in zip(info.rows, labels):
+    labels = [
+        ("Виконав", student_name or "________________"),
+        ("Група", group or "________________"),
+        ("Перевірив", teacher or "________________"),
+    ]
+    for row, (label, value) in zip(info.rows, labels):
         row.cells[0].width = Cm(4.5)
         row.cells[1].width = Cm(5.0)
         row.cells[0].text = label
-        row.cells[1].text = "________________________"
+        row.cells[1].text = value
         for cell in row.cells:
             set_cell_margins(cell, top=40, bottom=40)
             p_cell = cell.paragraphs[0]
@@ -384,6 +394,7 @@ def build_report(pr_url: str | None):
         add_list_item(doc, item)
 
     add_heading(doc, "3.2 Користувачі", 2)
+    add_body(doc, "Ролі користувачів та їхні можливості наведено в таблиці 1.")
     add_table(
         doc,
         ["Користувач", "Мета", "Можливості"],
@@ -393,6 +404,7 @@ def build_report(pr_url: str | None):
             ["Адміністратор", "Керувати каталогом і продажами", "Керування фільмами, залами, сеансами та звітами"],
         ],
         [3.4, 4.6, 9.0],
+        "Таблиця 1 — Ролі користувачів системи",
     )
 
     add_heading(doc, "3.3 Архітектура MVC", 2)
@@ -415,6 +427,7 @@ def build_report(pr_url: str | None):
         add_list_item(doc, item)
 
     add_heading(doc, "3.5 Логічні сутності та таблиці", 2)
+    add_body(doc, "Основні логічні сутності та відповідні таблиці майбутньої бази даних подано в таблиці 2.")
     add_table(
         doc,
         ["Модель", "Таблиця", "Основні поля", "Призначення"],
@@ -429,6 +442,7 @@ def build_report(pr_url: str | None):
             ["Payment", "payments", "id, order_id, provider, amount, status", "Оплата та повернення"],
         ],
         [2.7, 3.3, 7.0, 5.0],
+        "Таблиця 2 — Логічні сутності та таблиці бази даних",
     )
 
     add_heading(doc, "3.6 Вихідні дані", 2)
@@ -462,6 +476,7 @@ def build_report(pr_url: str | None):
     )
 
     add_heading(doc, "4.3 Повна форма Придбати електронний квиток", 2)
+    add_body(doc, "Характеристики повного варіанта використання наведено в таблиці 3.")
     use_case_rows = [
         ["Use Case Name", "Придбати електронний квиток"],
         ["Scope", "Електронна система продажу квитків до кінотеатру"],
@@ -470,12 +485,12 @@ def build_report(pr_url: str | None):
         ["Stakeholders and interests", "Покупець прагне швидко придбати квиток; кінотеатр має уникнути подвійного продажу й отримати оплату; адміністратор потребує достовірних даних; платіжний провайдер потребує коректного запиту"],
         ["Preconditions", "Покупець увійшов; сеанс активний; продаж відкритий; є доступні місця"],
         ["Success guarantee", "Замовлення оплачене; місця закріплені; квитки створені; покупець отримав підтвердження; продаж потрапив до звітів"],
-        ["Special Requirements", "HTTPS; транзакційне резервування; ідемпотентна оплата; відповідь каталогу до 2 секунд за нормального навантаження; журналювання"],
+        ["Special Requirements", "HTTPS; транзакційне резервування; ідемпотентна оплата; цільова відповідь каталогу до 2 секунд за нормального навантаження; журналювання"],
         ["Technology and Data Variations List", "Laravel MVC, Eloquent ORM, реляційна база даних, платіжний API, HTML або PDF квиток"],
-        ["Frequency of Occurrence", "Висока, орієнтовно 60 відсотків цільових операцій"],
+        ["Frequency of Occurrence", "Проєктна оцінка: близько 60 відсотків цільових операцій; потребує перевірки після запуску"],
         ["Miscellaneous", "Час блокування місць і правила повернення задаються конфігурацією"],
     ]
-    add_table(doc, ["Розділ", "Опис"], use_case_rows, [5.3, 12.7])
+    add_table(doc, ["Розділ", "Опис"], use_case_rows, [5.3, 12.7], "Таблиця 3 — Повний опис варіанта використання")
 
     add_heading(doc, "4.3.1 Головний успішний сценарій", 3)
     steps = [
@@ -514,42 +529,53 @@ def build_report(pr_url: str | None):
         add_compact_numbered_item(doc, number, item)
 
     landscape = doc.add_section(WD_SECTION.NEW_PAGE)
-    configure_section(landscape, landscape=True, narrow=True)
+    configure_section(landscape, landscape=True)
     add_heading(doc, "5 Діаграма варіантів використання")
     add_body(
         doc,
-        "Діаграма містить трьох акторів, щонайменше три дії для кожної ролі, асоціацію, узагальнення, include та extend.",
+        "Взаємодію трьох акторів із системою показано на рисунку 1. Діаграма містить асоціацію, узагальнення, include та extend. Вихідний код збережено у файлі use-case-diagram.puml.",
     )
-    add_caption(doc, "Рисунок 1 Діаграма варіантів використання")
-    add_picture(doc, USE_CASE_IMAGE, 158)
+    add_picture(doc, USE_CASE_IMAGE, 145)
+    add_caption(doc, "Рисунок 1 — Діаграма варіантів використання системи продажу квитків")
 
     landscape2 = doc.add_section(WD_SECTION.NEW_PAGE)
-    configure_section(landscape2, landscape=True, narrow=True)
+    configure_section(landscape2, landscape=True, large=True)
     add_heading(doc, "6 Діаграма класів")
-    add_caption(doc, "Рисунок 2 Діаграма класів")
-    add_picture(doc, CLASS_IMAGE, 185)
+    add_body(doc, "Структуру десяти предметних класів і трьох контролерів показано на рисунку 2. Вихідний код діаграми збережено у файлі class-diagram.puml.")
+    add_picture(doc, CLASS_IMAGE, 290)
+    add_caption(doc, "Рисунок 2 — Діаграма класів системи продажу квитків")
 
     portrait = doc.add_section(WD_SECTION.NEW_PAGE)
     configure_section(portrait)
-    add_heading(doc, "7 Результати публікації")
-    add_body(doc, "Архітектурний опис і вихідні файли PlantUML розміщено в репозиторії лабораторної роботи 1.")
+    add_heading(doc, "7 Перевірка та публікація")
+    add_body(doc, "Матеріали розміщено у гілці feature/system-design репозиторію лабораторної роботи 1. Вихідні файли PlantUML дають змогу відтворити обидві схеми та перевірити проєктні рішення. Локальна перевірка scripts/validate-lab2.ps1 підтвердила три актори, тринадцять класів, шістнадцять кроків головного сценарію та вісім альтернативних сценаріїв; результат — LAB_2 VALIDATION: PASS.")
     repo_p = doc.add_paragraph()
     configure_paragraph(repo_p, first_line=False)
-    set_run_font(repo_p.add_run("Файл architecture.md: "), bold=True)
-    add_hyperlink(repo_p, "відкрити на GitHub", "https://github.com/malyk-denys/php-ci-cd-lab/blob/feature/system-design/docs/architecture.md")
+    set_run_font(repo_p.add_run("Архітектурний опис: "), bold=True)
+    add_hyperlink(repo_p, "architecture.md у GitHub", "https://github.com/malyk-denys/php-ci-cd-lab/blob/feature/system-design/docs/architecture.md")
+    commit_p = doc.add_paragraph()
+    configure_paragraph(commit_p, first_line=False)
+    set_run_font(commit_p.add_run("Зафіксовані зміни: "), bold=True)
+    add_hyperlink(commit_p, "коміт e6a5dae", "https://github.com/malyk-denys/php-ci-cd-lab/commit/e6a5dae")
     pr_p = doc.add_paragraph()
     configure_paragraph(pr_p, first_line=False)
     set_run_font(pr_p.add_run("Pull Request: "), bold=True)
     if pr_url:
         add_hyperlink(pr_p, pr_url, pr_url)
     else:
-        set_run_font(pr_p.add_run("посилання буде додано після створення Pull Request"), italic=True)
+        set_run_font(pr_p.add_run("ще не створено; підключення GitHub відхилило дію через обмеження прав інтеграції"))
 
-    add_heading(doc, "8 Висновок")
+    add_heading(doc, "ВИСНОВКИ")
     add_body(
         doc,
         "У роботі визначено призначення, функції, ролі, сценарії та структуру даних електронної системи продажу квитків до кінотеатру. Три форми Use Case описують основні дії користувачів, а UML-діаграми задають поведінкову й структурну модель майбутнього застосунку. Запроєктовані моделі та контролери можна безпосередньо використати як основу для Eloquent-моделей, міграцій, маршрутів і контролерів Laravel. Транзакційне блокування місць та ідемпотентна обробка платежів запобігають подвійним продажам і повторному списанню коштів.",
     )
+    add_heading(doc, "ПЕРЕЛІК ДЖЕРЕЛ ПОСИЛАННЯ")
+    add_body(doc, "1. Лабораторна робота 2. Проєктування вебсистеми: аналіз предметної галузі, побудова діаграм варіантів використання та класів. Методичні матеріали до дисципліни «Вебпрограмування». 22 с.")
+    source_p = doc.add_paragraph()
+    configure_paragraph(source_p, first_line=True)
+    set_run_font(source_p.add_run("2. ДСТУ 3008:2015. Інформація та документація. Звіти у сфері науки і техніки. Структура та правила оформлювання. Київ: ДП «УкрНДНЦ», 2016. "))
+    add_hyperlink(source_p, "Електронна копія", "https://sumdu.edu.ua/wp-content/uploads/2025/09/dstu_3008-2015.pdf")
 
     doc.core_properties.title = "Лабораторна робота 2 Електронна система продажу квитків до кінотеатру"
     doc.core_properties.subject = "Проєктування веб системи та UML діаграми"
@@ -562,5 +588,10 @@ def build_report(pr_url: str | None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--pr-url")
+    parser.add_argument("--student-name")
+    parser.add_argument("--group")
+    parser.add_argument("--institution")
+    parser.add_argument("--department")
+    parser.add_argument("--teacher")
     args = parser.parse_args()
-    build_report(args.pr_url)
+    build_report(args.pr_url, args.student_name, args.group, args.institution, args.department, args.teacher)

@@ -56,7 +56,6 @@ Administrator --> UC_ManageScreenings
 Administrator --> UC_ManageHalls
 Administrator --> UC_Reports
 
-UC_Buy ..> UC_Auth : <<include>>
 UC_Buy ..> UC_Seats : <<include>>
 UC_Buy ..> UC_Pay : <<include>>
 UC_Buy ..> UC_Ticket : <<include>>

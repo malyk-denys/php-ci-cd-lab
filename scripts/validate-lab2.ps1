@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 
 $root = Split-Path -Parent $PSScriptRoot
 $docs = Join-Path $root 'docs'
@@ -23,14 +23,14 @@ foreach ($file in $required) {
     }
 }
 
-$useCase = Get-Content -Raw -LiteralPath (Join-Path $docs 'use-case-diagram.puml')
+$useCase = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $docs 'use-case-diagram.puml')
 $actorCount = ([regex]::Matches($useCase, '(?m)^actor ')).Count
 if ($actorCount -lt 3) { throw "Use Case Diagram has $actorCount actors; expected at least 3" }
 foreach ($token in @('<<include>>', '<<extend>>', '--|>')) {
     if (-not $useCase.Contains($token)) { throw "Use Case Diagram is missing $token" }
 }
 
-$classDiagram = Get-Content -Raw -LiteralPath (Join-Path $docs 'class-diagram.puml')
+$classDiagram = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $docs 'class-diagram.puml')
 $classMatches = [regex]::Matches($classDiagram, '(?ms)^\s*(?:abstract\s+)?class\s+(\w+)\s*\{(.*?)^\s*\}')
 if ($classMatches.Count -lt 10) {
     throw "Class Diagram has $($classMatches.Count) classes; expected at least 10"
@@ -50,7 +50,7 @@ foreach ($token in @(' o-- ', ' *-- ', ' <|-- ', ' -- ')) {
     if (-not $classDiagram.Contains($token)) { throw "Class Diagram is missing relationship token: $token" }
 }
 
-$architecture = Get-Content -Raw -LiteralPath (Join-Path $docs 'architecture.md')
+$architecture = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $docs 'architecture.md')
 $scenarioSection = [regex]::Match(
     $architecture,
     '(?ms)#### Головний успішний сценарій\s+(.*?)\s+#### Розширення'

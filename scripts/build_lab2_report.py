@@ -14,7 +14,7 @@ from docx.shared import Cm, Mm, Pt, RGBColor
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
-OUTPUT = DOCS / "Lab2_Report_A4.docx"
+OUTPUT = DOCS / "Lab2_Report_UML.docx"
 DIAGRAMS = DOCS / "a4_diagrams"
 USE_CASE_IMAGE = DIAGRAMS / "use-case-a4.png"
 CLASS_OVERVIEW_IMAGE = DIAGRAMS / "class-overview-a4.png"
@@ -547,19 +547,19 @@ def build_report(pr_url: str | None, student_name: str | None, group: str | None
         doc,
         "Взаємодію трьох акторів із системою показано на рисунку 1. Діаграма містить асоціацію, узагальнення, include та extend. Повний вихідний код UML збережено у файлі use-case-diagram.puml.",
     )
-    add_picture(doc, USE_CASE_IMAGE, 155, 190)
+    add_picture(doc, USE_CASE_IMAGE, 165, 202)
     add_caption(doc, "Рисунок 1 — Діаграма варіантів використання системи продажу квитків")
 
     doc.add_page_break()
     add_heading(doc, "6 Діаграма класів")
     add_body(doc, "Огляд десяти предметних класів і трьох контролерів подано на рисунку 2. Їхні типізовані атрибути й операції наведено на рисунках 3–6. Повний UML-код усіх зв’язків збережено у файлі class-diagram.puml.")
-    add_picture(doc, CLASS_OVERVIEW_IMAGE, 155, 190)
+    add_picture(doc, CLASS_OVERVIEW_IMAGE, 165, 202)
     add_caption(doc, "Рисунок 2 — Огляд класів і типів зв’язків системи продажу квитків")
     for number, (label, image_path) in enumerate(CLASS_DETAIL_IMAGES, start=3):
         doc.add_page_break()
         add_heading(doc, f"6.{number - 2} Класи: {label}")
         add_body(doc, "На рисунку наведено типи полів, параметрів і результатів методів класів цієї групи.")
-        add_picture(doc, image_path, 155, 190)
+        add_picture(doc, image_path, 165, 202)
         add_caption(doc, f"Рисунок {number} — Класи: {label.lower()}")
 
     doc.add_page_break()

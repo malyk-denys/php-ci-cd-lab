@@ -92,6 +92,51 @@ def arrow(draw, start, end, color=BLUE, width=5, dashed=False):
     draw.polygon(points, fill=color)
 
 
+def route(draw, points, color="#71889b", width=5, dashed=False):
+    """Draw a multi-segment UML connector, optionally dashed."""
+    for start, end in zip(points, points[1:]):
+        if dashed:
+            import math
+            length = math.dist(start, end)
+            steps = max(1, int(length // 18))
+            for i in range(0, steps, 2):
+                a, b = i / steps, min((i + 1) / steps, 1)
+                draw.line((start[0] + (end[0] - start[0]) * a,
+                           start[1] + (end[1] - start[1]) * a,
+                           start[0] + (end[0] - start[0]) * b,
+                           start[1] + (end[1] - start[1]) * b), fill=color, width=width)
+        else:
+            draw.line((*start, *end), fill=color, width=width)
+
+
+def symbol(draw, point, direction, kind, color=BLUE):
+    """UML endpoint marker pointing in the specified direction."""
+    import math
+    x, y = point
+    dx, dy = direction
+    length = math.hypot(dx, dy)
+    dx, dy = dx / length, dy / length
+    px, py = -dy, dx
+    if kind == "inheritance":
+        pts = [(x, y), (x - 30 * dx + 16 * px, y - 30 * dy + 16 * py),
+               (x - 30 * dx - 16 * px, y - 30 * dy - 16 * py)]
+        draw.polygon(pts, fill=WHITE, outline=color, width=5)
+    elif kind in ("aggregation", "composition"):
+        pts = [(x, y), (x + 21 * dx + 13 * px, y + 21 * dy + 13 * py),
+               (x + 42 * dx, y + 42 * dy),
+               (x + 21 * dx - 13 * px, y + 21 * dy - 13 * py)]
+        draw.polygon(pts, fill=color if kind == "composition" else WHITE,
+                     outline=color, width=5)
+
+
+def badge(draw, x, y, message, *, fill=WHITE, color=BLUE):
+    face = font(23, True)
+    box = draw.textbbox((0, 0), message, font=face)
+    width = box[2] - box[0] + 28
+    draw.rounded_rectangle((x, y, x + width, y + 42), radius=12, fill=fill, outline=color, width=2)
+    draw.text((x + 14, y + 5), message, font=face, fill=color)
+
+
 def actor(draw, x, y, label):
     draw.ellipse((x - 20, y, x + 20, y + 40), outline=NAVY, width=5)
     draw.line((x, y + 40, x, y + 105), fill=NAVY, width=5)
@@ -114,42 +159,71 @@ def oval(draw, box, lines):
 def use_cases():
     image, draw = canvas()
     title(draw, "Діаграма варіантів використання", "Електронна система продажу квитків до кінотеатру")
-    columns = [
-        (90, 590, "Відвідувач", ["Переглянути афішу", "Опис фільму", "Переглянути розклад", "Зареєструватися / увійти"]),
-        (650, 1150, "Покупець", ["Придбати квиток", "Обрати місця", "Виконати оплату", "Отримати е-квиток", "Застосувати промокод", "Мої квитки", "Повернути квиток"]),
-        (1210, 1710, "Адміністратор", ["Керувати фільмами", "Керувати сеансами", "Зали та місця", "Звіти з продажів", "Скасувати сеанс"]),
+    # One system boundary and three actor groups.  The connector endpoints
+    # are intentionally routed around the oval labels.
+    draw.rounded_rectangle((440, 230, 1720, 1995), radius=24, fill="#fbfdff", outline=BLUE, width=5)
+    draw.rounded_rectangle((500, 207, 1040, 255), radius=10, fill=BLUE)
+    center(draw, (770, 214), "Система продажу квитків", font(27, True), WHITE)
+    for top, bottom, label in [(290, 750, "ПЕРЕГЛЯД АФІШІ"),
+                                (780, 1435, "КУПІВЛЯ КВИТКІВ"),
+                                (1465, 1940, "КЕРУВАННЯ КІНОТЕАТРОМ")]:
+        draw.rounded_rectangle((475, top, 1685, bottom), radius=20,
+                               fill="#f4f8fc" if top != 780 else "#edf6fc")
+        draw.text((515, top + 15), label, font=font(23, True), fill=GRAY)
+
+    groups = [
+        (365, "Відвідувач", [
+            ("Афіша", 340, 0), ("Розклад", 470, 0), ("Реєстрація / вхід", 600, 0),
+            ("Опис фільму", 470, 1)]),
+        (900, "Покупець", [
+            ("Придбати квиток", 835, 0), ("Промокод", 975, 0),
+            ("Мої квитки", 1115, 0), ("Повернути квиток", 1255, 0),
+            ("Обрати місця", 835, 1), ("Оплатити", 975, 1),
+            ("Електронний квиток", 1115, 1)]),
+        (1570, "Адміністратор", [
+            ("Керувати фільмами", 1500, 0), ("Керувати сеансами", 1640, 0),
+            ("Звіти з продажів", 1780, 0), ("Зали та місця", 1500, 1),
+            ("Скасувати сеанс", 1640, 1)]),
     ]
     boxes = {}
-    for left, right, name, cases in columns:
-        draw.rounded_rectangle((left, 220, right, 1600), radius=22, outline="#9ab4c9", width=4)
-        x = (left + right) / 2
-        actor(draw, x, 245, name)
-        top = 520
-        trunk_x = left + 32
-        draw.line((x - 42, 312, trunk_x, 450, trunk_x, top + (len(cases) - 1) * 145 + 44), fill="#9aafc0", width=4)
-        for index, case in enumerate(cases):
-            y = top + index * 145
-            box = (left + 55, y, right - 55, y + 88)
-            draw.line((trunk_x, y + 44, left + 55, y + 44), fill="#9aafc0", width=4)
-            oval(draw, box, wrap(draw, case, font(30), 340))
-            boxes[case] = box
-    # The generalization and include/extend relationships are kept separate
-    # from actor associations so the case labels remain legible in print.
-    arrow(draw, (900, 213), (340, 213), NAVY, 4)
-    center(draw, (620, 185), "узагальнення", font(22), NAVY)
-    draw.rounded_rectangle((100, 1650, 1700, 2090), radius=22, fill="#f5f9fc", outline="#9ab4c9", width=4)
-    draw.text((135, 1680), "Зв’язки між варіантами використання", font=font(31, True), fill=NAVY)
-    relations = [
-        ("include", "Придбати квиток → Обрати місця, Виконати оплату, Отримати е-квиток"),
-        ("extend", "Застосувати промокод → Придбати квиток"),
-        ("extend", "Повернути квиток → Мої квитки"),
-        ("extend", "Скасувати сеанс → Керувати сеансами"),
-    ]
-    for i, (kind, message) in enumerate(relations):
-        y = 1745 + i * 75
-        draw.rounded_rectangle((135, y, 275, y + 48), radius=12, fill=BLUE)
-        center(draw, (205, y + 9), kind, font(23, True), WHITE)
-        draw.text((300, y + 8), message, font=font(25), fill=INK)
+    for actor_y, actor_name, cases in groups:
+        actor(draw, 230, actor_y, actor_name)
+        # Solid actor associations to three or more primary actions.
+        primary = [case for case in cases if case[2] == 0]
+        route(draw, [(272, actor_y + 67), (405, actor_y + 67),
+                     (405, primary[0][1] + 48), (560, primary[0][1] + 48)], width=5)
+        for case_name, y, column in primary[1:]:
+            route(draw, [(405, y + 48), (560, y + 48)], width=5)
+        route(draw, [(405, primary[0][1] + 48), (405, primary[-1][1] + 48)], width=5)
+        for case_name, y, column in cases:
+            x1 = 560 if column == 0 else 1170
+            box = (x1, y, x1 + 430, y + 96)
+            oval(draw, box, wrap(draw, case_name, font(30), 360))
+            boxes[case_name] = box
+
+    # Associations to secondary actor actions avoid crossing any use case.
+    route(draw, [(272, 432), (370, 432), (370, 275), (1120, 275),
+                 (1120, 518), (1170, 518)], width=4)
+    route(draw, [(272, 1637), (345, 1637), (345, 1445), (1120, 1445),
+                 (1120, 1548), (1170, 1548)], width=4)
+    # Actor generalization: a registered customer has visitor capabilities.
+    route(draw, [(215, 900), (75, 900), (75, 365), (210, 365)], color=NAVY, width=4)
+    symbol(draw, (210, 365), (1, 0), "inheritance", NAVY)
+    badge(draw, 84, 602, "наслідує", fill=WHITE, color=NAVY)
+
+    # Dashed arrows show the required include and conditional extend links.
+    arrow(draw, (990, 867), (1170, 875), BLUE, 5, dashed=True)
+    badge(draw, 1013, 810, "«include»")
+    arrow(draw, (990, 887), (1170, 1015), BLUE, 5, dashed=True)
+    badge(draw, 1040, 934, "«include»")
+    arrow(draw, (990, 909), (1170, 1155), BLUE, 5, dashed=True)
+    badge(draw, 1062, 1082, "«include»")
+    arrow(draw, (770, 975), (770, 931), BLUE, 5, dashed=True)
+    badge(draw, 790, 947, "«extend»")
+    arrow(draw, (770, 1255), (770, 1211), BLUE, 5, dashed=True)
+    badge(draw, 790, 1227, "«extend»")
+    arrow(draw, (1170, 1688), (990, 1688), BLUE, 5, dashed=True)
+    badge(draw, 1015, 1615, "«extend»")
     save(image, "use-case-a4.png")
 
 
@@ -166,34 +240,77 @@ def parse_classes():
 def class_overview():
     image, draw = canvas()
     title(draw, "Діаграма класів", "Огляд зв’язків між 13 класами")
-    groups = [
-        ("Користувачі", ["User", "Customer", "Administrator"]),
-        ("Каталог і кінозал", ["Movie", "CinemaHall", "Seat", "Screening"]),
-        ("Продаж квитків", ["Order", "Ticket", "Payment"]),
-        ("Контролери", ["CatalogController", "OrderController", "AdminController"]),
-    ]
-    y = 210
-    for heading, names in groups:
-        draw.rounded_rectangle((120, y, 1680, y + 350), radius=24, fill="#f5f9fc", outline="#9ab4c9", width=4)
-        draw.text((155, y + 22), heading, font=font(31, True), fill=NAVY)
-        gap = 20
-        card_width = (1480 - gap * (len(names) - 1)) / len(names)
-        for i, name in enumerate(names):
-            x1 = 160 + i * (card_width + gap)
-            x2 = x1 + card_width
-            draw.rounded_rectangle((x1, y + 110, x2, y + 245), radius=15, fill=WHITE, outline=BLUE, width=4)
-            center(draw, ((x1 + x2) / 2, y + 153), name, font(27, True), NAVY)
-        y += 390
-    draw.rounded_rectangle((120, 1800, 1680, 2110), radius=20, fill="#eaf3fa", outline=BLUE, width=3)
-    draw.text((150, 1830), "Основні типи зв’язків", font=font(31, True), fill=NAVY)
-    for i, line in enumerate([
-        "Наслідування: Customer та Administrator → User",
-        "Агрегація: Movie охоплює Screening",
-        "Композиція: CinemaHall містить Seat; Order містить Ticket",
-        "Асоціації: Customer–Order; Screening–Ticket; Order–Payment",
-        "Залежності: контролери звертаються до відповідних моделей",
-    ]):
-        draw.text((155, 1890 + i * 40), line, font=font(26), fill=INK)
+    draw.rounded_rectangle((65, 225, 1735, 1555), radius=24,
+                           fill="#f7fbfe", outline="#a9bfd0", width=4)
+    draw.rounded_rectangle((65, 1620, 1735, 1860), radius=24,
+                           fill="#edf5fb", outline="#a9bfd0", width=4)
+    badge(draw, 90, 234, "МОДЕЛІ", fill=BLUE, color=WHITE)
+    badge(draw, 90, 1629, "КОНТРОЛЕРИ", fill=BLUE, color=WHITE)
+
+    nodes = {
+        "User": (750, 285, 1050, 390),
+        "Customer": (285, 520, 585, 625),
+        "Administrator": (1215, 520, 1515, 625),
+        "Movie": (90, 805, 390, 910),
+        "CinemaHall": (750, 805, 1050, 910),
+        "Seat": (1410, 805, 1710, 910),
+        "Screening": (750, 1070, 1050, 1175),
+        "Order": (285, 1370, 585, 1475),
+        "Ticket": (750, 1370, 1050, 1475),
+        "Payment": (1410, 1370, 1710, 1475),
+        "CatalogController": (90, 1690, 450, 1795),
+        "OrderController": (720, 1690, 1080, 1795),
+        "AdminController": (1350, 1690, 1710, 1795),
+    }
+    # Inheritance points to the parent class.
+    route(draw, [(435, 520), (435, 445), (790, 445), (790, 390)], width=5)
+    symbol(draw, (790, 390), (0, -1), "inheritance")
+    route(draw, [(1365, 520), (1365, 445), (1010, 445), (1010, 390)], width=5)
+    symbol(draw, (1010, 390), (0, -1), "inheritance")
+    # Domain associations and whole-part relationships.
+    route(draw, [(435, 625), (435, 1370)], width=5)
+    badge(draw, 455, 1210, "оформлює")
+    route(draw, [(390, 857), (600, 857), (600, 1122), (750, 1122)], width=5)
+    symbol(draw, (390, 857), (1, 0), "aggregation")
+    badge(draw, 625, 965, "агрегація")
+    route(draw, [(1050, 857), (1410, 857)], width=5)
+    symbol(draw, (1050, 857), (1, 0), "composition")
+    badge(draw, 1105, 790, "композиція")
+    route(draw, [(900, 910), (900, 1070)], width=5)
+    route(draw, [(900, 1175), (900, 1370)], width=5)
+    route(draw, [(585, 1422), (750, 1422)], width=5)
+    symbol(draw, (585, 1422), (1, 0), "composition")
+    route(draw, [(585, 1465), (670, 1530), (1590, 1530), (1560, 1475)], width=5)
+    badge(draw, 1170, 1480, "оплата")
+    # Only representative controller dependencies are shown here; all of them
+    # remain in class-diagram.puml.
+    route(draw, [(270, 1690), (270, 910)], color="#7a99b4", width=4, dashed=True)
+    route(draw, [(900, 1690), (900, 1475)], color="#7a99b4", width=4, dashed=True)
+    route(draw, [(1530, 1690), (1670, 1600), (1670, 635), (1515, 573)],
+          color="#7a99b4", width=4, dashed=True)
+
+    for name, box in nodes.items():
+        x1, y1, x2, y2 = box
+        fill = WHITE if not name.endswith("Controller") else "#e7f0f8"
+        draw.rounded_rectangle(box, radius=15, fill=fill, outline=BLUE, width=5)
+        draw.rectangle((x1 + 3, y1 + 3, x1 + 11, y2 - 3), fill=BLUE)
+        center(draw, ((x1 + x2) / 2, y1 + 27), name, font(29, True), NAVY)
+    draw.rounded_rectangle((90, 1900, 1710, 2120), radius=18,
+                           fill="#f5f8fb", outline="#a9bfd0", width=3)
+    draw.text((120, 1922), "Позначення", font=font(31, True), fill=NAVY)
+    draw.line((130, 1995, 250, 1995), fill=BLUE, width=5)
+    draw.text((270, 1978), "асоціація", font=font(25), fill=INK)
+    draw.line((550, 1995, 670, 1995), fill=BLUE, width=5)
+    symbol(draw, (670, 1995), (1, 0), "inheritance")
+    draw.text((695, 1978), "наслідування", font=font(25), fill=INK)
+    draw.line((1120, 1995, 1240, 1995), fill=BLUE, width=5)
+    symbol(draw, (1120, 1995), (1, 0), "composition")
+    draw.text((1270, 1978), "композиція", font=font(25), fill=INK)
+    route(draw, [(130, 2060), (250, 2060)], color="#7a99b4", width=4, dashed=True)
+    draw.text((270, 2043), "залежність контролера", font=font(25), fill=INK)
+    draw.line((830, 2060, 950, 2060), fill=BLUE, width=5)
+    symbol(draw, (830, 2060), (1, 0), "aggregation")
+    draw.text((980, 2043), "агрегація", font=font(25), fill=INK)
     save(image, "class-overview-a4.png")
 
 

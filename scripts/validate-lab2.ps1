@@ -10,7 +10,14 @@ $required = @(
     'class-diagram.puml',
     'class-diagram.svg',
     'class-diagram.png',
-    'Lab2_Report.docx'
+    'Lab2_Report_A4.docx',
+    'Lab2_Report_A4.pdf',
+    'a4_diagrams/use-case-a4.png',
+    'a4_diagrams/class-overview-a4.png',
+    'a4_diagrams/class-users-a4.png',
+    'a4_diagrams/class-catalog-a4.png',
+    'a4_diagrams/class-sales-a4.png',
+    'a4_diagrams/class-controllers-a4.png'
 )
 
 foreach ($file in $required) {

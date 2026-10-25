@@ -14,9 +14,16 @@ from docx.shared import Cm, Mm, Pt, RGBColor
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
-OUTPUT = DOCS / "Lab2_Report.docx"
-USE_CASE_IMAGE = DOCS / "use-case-diagram.png"
-CLASS_IMAGE = DOCS / "class-diagram.png"
+OUTPUT = DOCS / "Lab2_Report_A4.docx"
+DIAGRAMS = DOCS / "a4_diagrams"
+USE_CASE_IMAGE = DIAGRAMS / "use-case-a4.png"
+CLASS_OVERVIEW_IMAGE = DIAGRAMS / "class-overview-a4.png"
+CLASS_DETAIL_IMAGES = [
+    ("Користувачі", DIAGRAMS / "class-users-a4.png"),
+    ("Каталог і кінозал", DIAGRAMS / "class-catalog-a4.png"),
+    ("Замовлення та оплата", DIAGRAMS / "class-sales-a4.png"),
+    ("Контролери MVC", DIAGRAMS / "class-controllers-a4.png"),
+]
 
 FONT = "Times New Roman"
 BLUE = "1F4E78"
@@ -262,8 +269,9 @@ def add_hyperlink(paragraph, text: str, url: str):
 
 
 def build_report(pr_url: str | None, student_name: str | None, group: str | None, institution: str | None, department: str | None, teacher: str | None):
-    if not USE_CASE_IMAGE.exists() or not CLASS_IMAGE.exists():
-        raise FileNotFoundError("Render both PlantUML diagrams before building the report")
+    required_images = [USE_CASE_IMAGE, CLASS_OVERVIEW_IMAGE] + [path for _, path in CLASS_DETAIL_IMAGES]
+    if any(not path.exists() for path in required_images):
+        raise FileNotFoundError("Run scripts/draw_lab2_diagrams.py before building the report")
 
     doc = Document()
     section = doc.sections[0]
@@ -533,27 +541,30 @@ def build_report(pr_url: str | None, student_name: str | None, group: str | None
     for number, item in enumerate(alternatives, start=1):
         add_compact_numbered_item(doc, number, item)
 
-    landscape = doc.add_section(WD_SECTION.NEW_PAGE)
-    configure_section(landscape, landscape=True, large=True)
+    doc.add_page_break()
     add_heading(doc, "5 Діаграма варіантів використання")
     add_body(
         doc,
-        "Взаємодію трьох акторів із системою показано на рисунку 1. Діаграма містить асоціацію, узагальнення, include та extend. Вихідний код збережено у файлі use-case-diagram.puml.",
+        "Взаємодію трьох акторів із системою показано на рисунку 1. Діаграма містить асоціацію, узагальнення, include та extend. Повний вихідний код UML збережено у файлі use-case-diagram.puml.",
     )
-    add_picture(doc, USE_CASE_IMAGE, 200, 174)
+    add_picture(doc, USE_CASE_IMAGE, 155, 190)
     add_caption(doc, "Рисунок 1 — Діаграма варіантів використання системи продажу квитків")
 
-    landscape2 = doc.add_section(WD_SECTION.NEW_PAGE)
-    configure_section(landscape2, landscape=True, large=True)
+    doc.add_page_break()
     add_heading(doc, "6 Діаграма класів")
-    add_body(doc, "Структуру десяти предметних класів і трьох контролерів показано на рисунку 2. Вихідний код діаграми збережено у файлі class-diagram.puml.")
-    add_picture(doc, CLASS_IMAGE, 260, 200)
-    add_caption(doc, "Рисунок 2 — Діаграма класів системи продажу квитків")
+    add_body(doc, "Огляд десяти предметних класів і трьох контролерів подано на рисунку 2. Їхні типізовані атрибути й операції наведено на рисунках 3–6. Повний UML-код усіх зв’язків збережено у файлі class-diagram.puml.")
+    add_picture(doc, CLASS_OVERVIEW_IMAGE, 155, 190)
+    add_caption(doc, "Рисунок 2 — Огляд класів і типів зв’язків системи продажу квитків")
+    for number, (label, image_path) in enumerate(CLASS_DETAIL_IMAGES, start=3):
+        doc.add_page_break()
+        add_heading(doc, f"6.{number - 2} Класи: {label}")
+        add_body(doc, "На рисунку наведено типи полів, параметрів і результатів методів класів цієї групи.")
+        add_picture(doc, image_path, 155, 190)
+        add_caption(doc, f"Рисунок {number} — Класи: {label.lower()}")
 
-    portrait = doc.add_section(WD_SECTION.NEW_PAGE)
-    configure_section(portrait)
+    doc.add_page_break()
     add_heading(doc, "7 Перевірка та публікація")
-    add_body(doc, "Матеріали розміщено у гілці feature/system-design репозиторію лабораторної роботи 1. Вихідні файли PlantUML дають змогу відтворити обидві схеми та перевірити проєктні рішення. Локальна перевірка scripts/validate-lab2.ps1 підтвердила три актори, тринадцять класів, шістнадцять кроків головного сценарію та вісім альтернативних сценаріїв; результат — LAB_2 VALIDATION: PASS.")
+    add_body(doc, "Матеріали розміщено у гілці feature/system-design репозиторію лабораторної роботи 1. Повний UML-код збережено у файлах PlantUML, а сторінки звіту створено окремим скриптом візуалізації scripts/draw_lab2_diagrams.py. Локальна перевірка scripts/validate-lab2.ps1 підтвердила три актори, тринадцять класів, шістнадцять кроків головного сценарію та вісім альтернативних сценаріїв; результат — LAB_2 VALIDATION: PASS.")
     repo_p = doc.add_paragraph()
     configure_paragraph(repo_p, first_line=False)
     set_run_font(repo_p.add_run("Архітектурний опис: "), bold=True)

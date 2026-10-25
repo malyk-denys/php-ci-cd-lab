@@ -224,7 +224,12 @@ def add_caption(doc: Document, text: str):
     return p
 
 
-def add_picture(doc: Document, path: Path, width_mm: float):
+def add_picture(doc: Document, path: Path, max_width_mm: float, max_height_mm: float):
+    from PIL import Image
+
+    with Image.open(path) as source:
+        width_px, height_px = source.size
+    width_mm = min(max_width_mm, max_height_mm * width_px / height_px)
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_after = Pt(0)
@@ -535,14 +540,14 @@ def build_report(pr_url: str | None, student_name: str | None, group: str | None
         doc,
         "Взаємодію трьох акторів із системою показано на рисунку 1. Діаграма містить асоціацію, узагальнення, include та extend. Вихідний код збережено у файлі use-case-diagram.puml.",
     )
-    add_picture(doc, USE_CASE_IMAGE, 145)
+    add_picture(doc, USE_CASE_IMAGE, 135, 115)
     add_caption(doc, "Рисунок 1 — Діаграма варіантів використання системи продажу квитків")
 
     landscape2 = doc.add_section(WD_SECTION.NEW_PAGE)
     configure_section(landscape2, landscape=True, large=True)
     add_heading(doc, "6 Діаграма класів")
     add_body(doc, "Структуру десяти предметних класів і трьох контролерів показано на рисунку 2. Вихідний код діаграми збережено у файлі class-diagram.puml.")
-    add_picture(doc, CLASS_IMAGE, 290)
+    add_picture(doc, CLASS_IMAGE, 260, 200)
     add_caption(doc, "Рисунок 2 — Діаграма класів системи продажу квитків")
 
     portrait = doc.add_section(WD_SECTION.NEW_PAGE)

@@ -1,5 +1,10 @@
 # PHP CI/CD Lab
 
+## Лабораторна робота №3 — варіант 3
+
+Реалізація основ PHP та задач 2 / 3 / 7: [інструкція, алгоритми та пояснення](docs/lab3/README.md).
+Запуск: `.\scripts\start-lab3.ps1`, перевірка: `.\scripts\verify-lab3.ps1`.
+
 [![PHP CI Application](https://github.com/malyk-denys/php-ci-cd-lab/actions/workflows/php-ci.yml/badge.svg)](https://github.com/malyk-denys/php-ci-cd-lab/actions/workflows/php-ci.yml)
 
 Навчальний PHP-проєкт для лабораторної роботи №1 з керування версіями та налаштування CI/CD у GitHub Actions.

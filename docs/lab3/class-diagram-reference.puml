@@ -1,0 +1,229 @@
+@startuml
+!theme plain
+!pragma layout smetana
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName "Arial"
+skinparam defaultFontSize 12
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam class {
+  BackgroundColor #F9FBFD
+  BorderColor #1F4E78
+  ArrowColor #4A5568
+  HeaderBackgroundColor #D9EAF7
+}
+
+title Діаграма класів системи продажу квитків до кінотеатру
+
+package "Models" {
+  abstract class User {
+    - id: int
+    - name: string
+    - email: string
+    - passwordHash: string
+    - role: string
+    - status: string
+    + authenticate(password: string): bool
+    + updateProfile(name: string, email: string): void
+    + changePassword(oldPassword: string, newPassword: string): bool
+    + deactivate(): void
+    + getOrders(): List<Order>
+  }
+
+  class Customer {
+    - loyaltyPoints: int
+    - phone: string
+    - preferredLanguage: string
+    - registeredAt: DateTime
+    - marketingConsent: bool
+    + browseCatalog(filter: string): List<Movie>
+    + selectSeat(screeningId: int, seatId: int): bool
+    + createOrder(screeningId: int): Order
+    + applyPromo(code: string): decimal
+    + requestRefund(ticketId: int): bool
+  }
+
+  class Administrator {
+    - employeeNumber: string
+    - permissions: string[]
+    - lastLoginAt: DateTime
+    - department: string
+    - active: bool
+    + createMovie(data: array): Movie
+    + scheduleScreening(movieId: int, hallId: int, startAt: DateTime): Screening
+    + updateScreening(screeningId: int, data: array): void
+    + cancelScreening(screeningId: int): void
+    + buildSalesReport(from: Date, to: Date): array
+  }
+
+  class Movie {
+    - id: int
+    - title: string
+    - description: text
+    - durationMinutes: int
+    - ageRating: string
+    - releaseDate: Date
+    + create(data: array): Movie
+    + update(data: array): void
+    + publish(): void
+    + archive(): void
+    + getScreenings(from: DateTime): List<Screening>
+  }
+
+  class CinemaHall {
+    - id: int
+    - name: string
+    - capacity: int
+    - screenType: string
+    - status: string
+    + addSeat(row: string, number: int, type: string): Seat
+    + removeSeat(seatId: int): void
+    + changeStatus(status: string): void
+    + getSeats(): List<Seat>
+    + getAvailableSeats(screeningId: int): List<Seat>
+  }
+
+  class Seat {
+    - id: int
+    - hallId: int
+    - rowNumber: string
+    - seatNumber: int
+    - type: string
+    - status: string
+    + markAvailable(): void
+    + reserve(orderId: int): bool
+    + release(): void
+    + markOutOfService(): void
+    + getLabel(): string
+  }
+
+  class Screening {
+    - id: int
+    - movieId: int
+    - hallId: int
+    - startAt: DateTime
+    - basePrice: decimal
+    - status: string
+    + calculatePrice(seatType: string): decimal
+    + getAvailableSeats(): List<Seat>
+    + reserveSeat(seatId: int, orderId: int): bool
+    + releaseSeat(seatId: int): void
+    + cancel(reason: string): void
+  }
+
+  class Order {
+    - id: int
+    - customerId: int
+    - screeningId: int
+    - status: string
+    - totalAmount: decimal
+    - expiresAt: DateTime
+    + addTicket(seatId: int): Ticket
+    + removeTicket(ticketId: int): void
+    + applyDiscount(code: string): decimal
+    + calculateTotal(): decimal
+    + confirm(paymentId: int): void
+    + cancel(reason: string): void
+  }
+
+  class Ticket {
+    - id: int
+    - orderId: int
+    - screeningId: int
+    - seatId: int
+    - code: string
+    - status: string
+    + generateCode(): string
+    + validate(code: string): bool
+    + cancel(reason: string): void
+    + markUsed(usedAt: DateTime): void
+    + getPdfPayload(): array
+  }
+
+  class Payment {
+    - id: int
+    - orderId: int
+    - provider: string
+    - amount: decimal
+    - status: string
+    - paidAt: DateTime
+    + initiate(returnUrl: string): string
+    + confirm(transactionId: string): bool
+    + reject(reason: string): void
+    + refund(amount: decimal): bool
+    + isSuccessful(): bool
+  }
+}
+
+package "Controllers" {
+  class CatalogController {
+    - requestId: string
+    - currentPage: int
+    - pageSize: int
+    - sortBy: string
+    - activeFilter: string
+    + index(filter: string): View
+    + show(movieId: int): View
+    + schedule(movieId: int, date: Date): View
+    + seats(screeningId: int): View
+    + search(query: string): JsonResponse
+  }
+
+  class OrderController {
+    - requestId: string
+    - currentCustomerId: int
+    - idempotencyKey: string
+    - timeoutSeconds: int
+    - currency: string
+    + create(screeningId: int): JsonResponse
+    + selectSeats(orderId: int, seatIds: int[]): JsonResponse
+    + applyPromo(orderId: int, code: string): JsonResponse
+    + pay(orderId: int, paymentToken: string): RedirectResponse
+    + cancel(orderId: int): JsonResponse
+  }
+
+  class AdminController {
+    - requestId: string
+    - currentAdminId: int
+    - auditEnabled: bool
+    - reportFormat: string
+    - timeZone: string
+    + storeMovie(data: array): RedirectResponse
+    + updateMovie(movieId: int, data: array): RedirectResponse
+    + storeScreening(data: array): RedirectResponse
+    + cancelScreening(screeningId: int, reason: string): RedirectResponse
+    + salesReport(from: Date, to: Date): BinaryResponse
+  }
+}
+
+User <|-- Customer : наслідування
+User <|-- Administrator : наслідування
+Customer "1" -- "0..*" Order : оформлює
+Movie "1" o-- "0..*" Screening : має сеанси
+CinemaHall "1" *-- "1..*" Seat : складається з
+CinemaHall "1" -- "0..*" Screening : приймає
+Screening "1" -- "0..*" Ticket : допускає
+Order "1" *-- "1..*" Ticket : містить
+Order "1" -- "0..1" Payment : оплачується
+Administrator ..> Movie : керує
+Administrator ..> Screening : керує
+CatalogController ..> Movie
+CatalogController ..> Screening
+CatalogController ..> CinemaHall
+OrderController ..> Order
+OrderController ..> Payment
+OrderController ..> Ticket
+AdminController ..> Administrator
+AdminController ..> Movie
+AdminController ..> Screening
+
+legend bottom
+  Суцільна лінія: асоціація
+  Порожній ромб: агрегація
+  Заповнений ромб: композиція
+  Порожній трикутник: наслідування
+endlegend
+@enduml

@@ -29,4 +29,3 @@ $order = [
             <?= htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8') ?></li>
     <?php } ?>
 </ul>
-

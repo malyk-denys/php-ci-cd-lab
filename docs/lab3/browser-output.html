@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Лабораторна 3 · Варіант 3</title>
+    <style>
+        body{margin:0;background:#f1f5f9;color:#172438;font:17px/1.6 system-ui,sans-serif}
+        main{max-width:950px;margin:auto;padding:36px 20px}header{margin-bottom:28px}
+        h1{line-height:1.2}h2{font-size:23px;margin-top:0}h3{font-size:18px}
+        section{background:white;border:1px solid #d5deea;border-radius:12px;padding:24px;margin:18px 0}
+        .eyebrow{color:#365d9c;font-weight:700}code{background:#edf2f7;padding:4px 7px;border-radius:4px;overflow-wrap:anywhere}
+        .error{color:#a52424}.done{color:#226440}footer{color:#52647c}li{overflow-wrap:anywhere}
+    </style>
+</head>
+<body><main>
+<header><p class="eyebrow">ВЕБ-ПРОГРАМУВАННЯ / ВАРІАНТ 3</p>
+<h1>Основи PHP: структури даних, функції</h1>
+<p>Предметна галузь: система продажу квитків до кінотеатру.</p></header>
+<section><h2>01 / Масиви та сутність Order</h2>
+<h3>Фільми за алфавітом</h3>
+<ul>
+            <li>Avatar</li>
+            <li>Dune</li>
+            <li>Inception</li>
+            <li>Interstellar</li>
+            <li>Tenet</li>
+    </ul>
+<h3>Замовлення Order: атрибути з UML</h3>
+<ul>
+            <li><strong>id:</strong>
+            1</li>
+            <li><strong>customerId:</strong>
+            7</li>
+            <li><strong>screeningId:</strong>
+            12</li>
+            <li><strong>status:</strong>
+            pending</li>
+            <li><strong>totalAmount:</strong>
+            450</li>
+            <li><strong>expiresAt:</strong>
+            2026-10-29T18:15:00+01:00</li>
+    </ul>
+</section>
+<section><h2>02 / Типізована функція</h2>
+<p>Order::calculateTotal → calculateTotal(float $price, int $quantity): float</p>
+<p>3 квитки × 150 грн = <strong>450 грн</strong>.</p>
+<p>Знижка 10% на 450 грн: <strong>405 грн</strong>.</p></section>
+<section><h2>03 / Faker та замикання з use</h2>
+<p>10 випадкових цін квитків (100–500 грн):</p>
+<p><code>235, 486, 105, 361, 368, 369, 268, 204, 407, 286</code></p>
+<p>Ціни, строго більші за 250 грн:</p>
+<p><code>486, 361, 368, 369, 268, 407, 286</code></p>
+<p>Під час оновлення сторінки Faker генерує нові значення.</p></section>
+<section><h2>04 / try · catch · finally</h2>
+<p>Спроба застосувати некоректну знижку 150%:</p>
+<p class="error">Помилка: Неприпустиме значення знижки!</p><p class="done">Завершення спроби розрахунку.</p></section>
+<section><h2>05 / Алгоритми: задачі 2, 3, 7</h2>
+<h3>Таблиця 3.2, №2 — нуль після додатного елемента</h3>
+<p>Вхід: <code>[4,-2,0,7,-5,1]</code></p>
+<p>Результат: <code>[4,0,-2,0,7,0,-5,1,0]</code></p>
+<h3>Таблиця 3.3, №3 — три останні слова</h3>
+<p>Вхід: Сьогодні ми бронюємо квитки до кінотеатру</p>
+<p>Результат: <code>квитки до кінотеатру</code></p>
+<h3>Таблиця 3.4, №7 — спочатку цифри, потім букви</h3>
+<p>Вхід: <code>a3Б1c9Я2</code></p>
+<p>Результат: <code>3192aБcЯ</code></p>
+<p>Початковий порядок усередині кожної групи збережено.</p></section>
+<footer>Лабораторна робота №3 · PHP / Composer / Faker</footer>
+</main></body></html>

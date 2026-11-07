@@ -27,6 +27,8 @@
     },
     "config": {
         "sort-packages": true
+    },
+    "require": {
+        "fakerphp/faker": "^1.24"
     }
 }
-

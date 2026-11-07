@@ -1,0 +1,20 @@
+No syntax errors detected in index.php
+No syntax errors detected in C:\Users\malyk\Projects\PHP\lab_1\app\Models\EntityArray.php
+No syntax errors detected in C:\Users\malyk\Projects\PHP\lab_1\app\Services\Calculator.php
+No syntax errors detected in C:\Users\malyk\Projects\PHP\lab_1\app\Services\DataProcessor.php
+No syntax errors detected in C:\Users\malyk\Projects\PHP\lab_1\app\Services\EntityService.php
+No syntax errors detected in C:\Users\malyk\Projects\PHP\lab_1\tests\Unit\CalculatorTest.php
+No syntax errors detected in C:\Users\malyk\Projects\PHP\lab_1\tests\Unit\DataProcessorTest.php
+No syntax errors detected in C:\Users\malyk\Projects\PHP\lab_1\tests\Unit\EntityServiceTest.php
+{"tool":"pint","result":"passed"}
+PHPUnit 10.5.66 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.2.35
+Configuration: C:\Users\malyk\Projects\PHP\lab_1\phpunit.xml
+
+.................................                                 33 / 33 (100%)
+
+Time: 00:00.021, Memory: 8.00 MB
+
+OK (33 tests, 42 assertions)
+LAB 3 VALIDATION: PASS

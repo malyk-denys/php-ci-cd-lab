@@ -1,0 +1,33 @@
+{
+    "name": "malyk-denys/web-programming-lab-4",
+    "description": "Лабораторна робота №4: ООП у PHP, патерни та варіант 3",
+    "type": "project",
+    "require": {
+        "php": "^8.2"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.30",
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "lint": "pint --test",
+        "check": [
+            "@lint",
+            "@test"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

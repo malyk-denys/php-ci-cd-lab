@@ -1,0 +1,51 @@
+name: Lab 5 CI
+
+on:
+  push:
+    paths:
+      - "lab_5/**"
+      - ".github/workflows/lab5-ci.yml"
+  pull_request:
+    paths:
+      - "lab_5/**"
+      - ".github/workflows/lab5-ci.yml"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lab_5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, fileinfo, pdo_sqlite
+          coverage: none
+
+      - uses: ramsey/composer-install@v3
+        with:
+          working-directory: lab_5
+
+      - name: Configure application
+        shell: bash
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Check PHP syntax
+        shell: bash
+        run: find app bootstrap config database routes tests -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Inspect routes
+        run: php artisan route:list
+
+      - name: Check formatting
+        run: vendor/bin/pint --test
+
+      - name: Run tests
+        run: php artisan test
+

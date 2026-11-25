@@ -1,5 +1,11 @@
 # PHP CI/CD Lab
 
+## Лабораторна робота №5 — варіант 3
+
+Самодостатній Laravel-проєкт системи продажу квитків розміщено в [`lab_5/`](lab_5/README.md). Він містить власні залежності, маршрути, контролери, middleware, тести, скрипти запуску, CI та DOCX-звіт.
+
+[![Lab 5 CI](https://github.com/malyk-denys/php-ci-cd-lab/actions/workflows/lab5-ci.yml/badge.svg)](https://github.com/malyk-denys/php-ci-cd-lab/actions/workflows/lab5-ci.yml)
+
 ## Лабораторна робота №3 — варіант 3
 
 Реалізація основ PHP та задач 2 / 3 / 7: [інструкція, алгоритми та пояснення](docs/lab3/README.md).

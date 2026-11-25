@@ -1,0 +1,43 @@
+name: Lab 4 CI
+
+on:
+  push:
+    paths:
+      - "lab_4/**"
+      - ".github/workflows/lab4-ci.yml"
+  pull_request:
+    paths:
+      - "lab_4/**"
+      - ".github/workflows/lab4-ci.yml"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lab_4
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          coverage: none
+
+      - uses: ramsey/composer-install@v3
+        with:
+          working-directory: lab_4
+
+      - name: Check PHP syntax
+        shell: bash
+        run: find app tests -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Check formatting
+        run: vendor/bin/pint --test
+
+      - name: Run tests
+        run: vendor/bin/phpunit --colors=always
+
+      - name: Execute demo
+        run: php index.php > /tmp/lab4-output.html

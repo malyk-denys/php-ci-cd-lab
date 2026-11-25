@@ -20,4 +20,3 @@ php artisan key:generate
 ```
 
 GitHub Actions виконує ті самі перевірки з робочим каталогом `lab_5`.
-

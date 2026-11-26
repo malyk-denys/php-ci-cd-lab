@@ -1,5 +1,11 @@
 # PHP CI/CD Lab
 
+## Лабораторна робота №6 — варіант 3
+
+Самодостатній Laravel-проєкт з Eloquent-моделями, міграціями та зв'язками 1:M і M:M розміщено в [`lab_6/`](lab_6/README.md). Він містить SQLite-схему, фабрики, сідер, CRUD, тести, CI та DOCX-звіт.
+
+[![Lab 6 CI](https://github.com/malyk-denys/php-ci-cd-lab/actions/workflows/lab6-ci.yml/badge.svg)](https://github.com/malyk-denys/php-ci-cd-lab/actions/workflows/lab6-ci.yml)
+
 ## Лабораторна робота №5 — варіант 3
 
 Самодостатній Laravel-проєкт системи продажу квитків розміщено в [`lab_5/`](lab_5/README.md). Він містить власні залежності, маршрути, контролери, middleware, тести, скрипти запуску, CI та DOCX-звіт.

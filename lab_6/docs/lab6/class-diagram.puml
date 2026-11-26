@@ -1,0 +1,50 @@
+@startuml
+!theme plain
+left to right direction
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+class Event {
+  +id: int
+  +name: string
+  +slug: string
+  +venue: string
+  +starts_at: datetime
+  +status: string
+  +tickets(): HasMany
+}
+
+class Ticket {
+  +id: int
+  +event_id: int
+  +code: string
+  +seat_number: string
+  +price: decimal
+  +customer_email: string
+  +status: string
+  +event(): BelongsTo
+  +discounts(): BelongsToMany
+}
+
+class Discount {
+  +id: int
+  +code: string
+  +name: string
+  +type: string
+  +value: decimal
+  +is_active: bool
+  +tickets(): BelongsToMany
+}
+
+class discount_ticket <<pivot>> {
+  +id: int
+  +discount_id: int
+  +ticket_id: int
+}
+
+Event "1" -- "0..*" Ticket : hasMany / belongsTo
+Ticket "1" -- "0..*" discount_ticket
+Discount "1" -- "0..*" discount_ticket
+Ticket "0..*" -- "0..*" Discount : belongsToMany
+@enduml

@@ -197,7 +197,7 @@ def make_schema_image(output: Path) -> None:
     )
     draw_box(
         draw,
-        (720, 790, 1165, 985),
+        (720, 790, 1165, 1020),
         "discount_ticket",
         [
             "PK  id",

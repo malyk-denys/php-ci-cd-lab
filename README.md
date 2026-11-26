@@ -1,5 +1,11 @@
 # PHP CI/CD Lab
 
+## Лабораторна робота №7 — варіант 3
+
+Самодостатній Laravel-проєкт із Blade layout, компонентами, формами та повним CRUD для `Ticket`, `Event` і `Discount` розміщено в [`lab_7/`](lab_7/README.md). Він містить зв'язки 1:M і M:M у формах, серверну валідацію, CSRF, Method Spoofing, тести, CI та DOCX-звіт без відповідей на контрольні питання.
+
+[![Lab 7 CI](https://github.com/malyk-denys/php-ci-cd-lab/actions/workflows/lab7-ci.yml/badge.svg)](https://github.com/malyk-denys/php-ci-cd-lab/actions/workflows/lab7-ci.yml)
+
 ## Лабораторна робота №6 — варіант 3
 
 Самодостатній Laravel-проєкт з Eloquent-моделями, міграціями та зв'язками 1:M і M:M розміщено в [`lab_6/`](lab_6/README.md). Він містить SQLite-схему, фабрики, сідер, CRUD, тести, CI та DOCX-звіт.

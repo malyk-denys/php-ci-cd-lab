@@ -1,0 +1,12 @@
+{
+  "issue_number": 16,
+  "issue_url": "https://github.com/malyk-denys/php-ci-cd-lab/issues/16",
+  "branch": "feature/lab-7-blade-ui",
+  "pr_number": 17,
+  "pr_url": "https://github.com/malyk-denys/php-ci-cd-lab/pull/17",
+  "ci_run_url": "https://github.com/malyk-denys/php-ci-cd-lab/actions/runs/45889201609",
+  "ci_status": "success",
+  "merge_commit": "6edd3983132b24711c2a360336cb63f3afb0a668",
+  "kanban_project": "PHP CI/CD Lab",
+  "kanban_status": "Done"
+}

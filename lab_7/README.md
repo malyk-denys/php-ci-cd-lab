@@ -40,4 +40,4 @@ php artisan key:generate
 
 Застосунок буде доступний за адресою `http://127.0.0.1:8000`. Якщо PHP відсутній у `PATH`, задайте шлях через змінну `LAB7_PHP`.
 
-Технічний опис: [docs/lab7/README.md](docs/lab7/README.md). Звіт: [docs/lab7/Lab7_Report_Variant3.docx](docs/lab7/Lab7_Report_Variant3.docx).
+Технічний опис: [docs/lab7/README.md](docs/lab7/README.md). Звіт доступний у форматах [DOCX](docs/lab7/Lab7_Report_Variant3.docx) і [PDF](docs/lab7/Lab7_Report_Variant3.pdf).

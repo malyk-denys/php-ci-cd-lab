@@ -286,10 +286,9 @@ def add_github_evidence(doc: Document) -> None:
         f"Pull Request #{evidence['pr_number']} пройшов автоматичну перевірку Lab 7 CI та був об’єднаний з main. "
         "Після злиття Issue закрито, а завдання на Kanban-дошці переведено у стан Done.",
     )
-    add_picture(doc, ASSETS / "08-github-issue.png", "Рисунок 15 - Issue лабораторної роботи 7", "Відкрите GitHub Issue лабораторної роботи 7", 15.8)
+    add_picture(doc, ASSETS / "08-github-issue.png", "Рисунок 15 - Завершене Issue лабораторної роботи 7", "Закрите GitHub Issue зі статусом Done", 15.8)
     add_picture(doc, ASSETS / "09-github-ci.png", "Рисунок 16 - Успішна перевірка Lab 7 CI", "Успішний GitHub Actions workflow лабораторної роботи 7", 15.8)
     add_picture(doc, ASSETS / "10-github-pr.png", "Рисунок 17 - Об’єднаний Pull Request", "Об’єднаний Pull Request лабораторної роботи 7", 15.8)
-    add_picture(doc, ASSETS / "11-github-kanban.png", "Рисунок 18 - Завершене завдання на Kanban-дошці", "Issue лабораторної роботи 7 у колонці Done", 15.8)
 
 
 def add_conclusion(doc: Document) -> None:
